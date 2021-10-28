@@ -94,8 +94,8 @@ for var in VARLIST:
         t = timelist[it]
         inputfile = "%s%s.%010d.data" %(INPUTDIR,var, (it+1)*TimeSteps_in_h)
         outfile   = "%save.%s.%s.nc"  %(OUTDIR,t.strftime(dateformat),var)
-        print outfile
+        print(outfile)
         M3d = readFrame_from_file(inputfile, 0, TheMask.shape)
         M3d[~TheMask.mask] = 1.e+20
         netcdf4.write_3d_file(M3d, var, outfile, TheMask, compression=True)
-    
+
