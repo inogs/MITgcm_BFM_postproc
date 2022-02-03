@@ -100,11 +100,11 @@
 
 <!--  pCO2 -->
 <plots var="pCO2" units="uatm" plotunits="$\mu$ atm "  name="pCO2" longname="seawater pCO2">
-<depth top= "0000" bottom="0010"  clim="[350,650]"> </depth>
-<depth top= "0010" bottom="0030"  clim="[350,650]"> </depth>
-<depth top= "0030" bottom="0060"  clim="[350,650]"> </depth>
-<depth top= "0060" bottom="0100"  clim="[350,650]"> </depth>
-<depth top= "0100" bottom="0150"  clim="[350,650]"> </depth>
+<depth top= "0000" bottom="0010"  clim="[350,780]"> </depth>
+<depth top= "0010" bottom="0030"  clim="[350,780]"> </depth>
+<depth top= "0030" bottom="0060"  clim="[350,780]"> </depth>
+<depth top= "0060" bottom="0100"  clim="[350,780]"> </depth>
+<depth top= "0100" bottom="0150"  clim="[350,780]"> </depth>
 </plots>
 
 <plots var="CO2airflux" units="mmol/m2/d " plotunits="mmol m$^{-2}d$^{-1} $" name="fluxCO2" longname="CO2 air-sea flux">
