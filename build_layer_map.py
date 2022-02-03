@@ -81,7 +81,7 @@ dateend        = (rundate_dt+DL.relativedelta(hours=71)).strftime("%Y%m%d-%H:%M:
 dateformat="%Y%m%d-%H:%M:%S"
 
 
-plot_timelist=DL.getTimeList(datestart_plot, dateend, "hours=1")
+plot_timelist=DL.getTimeList(datestart_plot, dateend, hours=1)
 PTL= TimeList(plot_timelist)
 
 TheMask = Mask(args.maskfile)
@@ -101,7 +101,7 @@ for p in mb._MapBuilder__plotlist:
         dt=plot_timelist[iFrame_plot]
         inputfile="%save.%s.%s.nc"  %(INPUTDIR,dt.strftime(dateformat),var)
         datestr=dt.strftime("%d %h %Y - %H:%M UTC")
-        print "rank %d works on %s" %(rank, inputfile)
+        print("rank %d works on %s" %(rank, inputfile))
         De = DataExtractor(TheMask,inputfile,var)
 
         for il, layer in enumerate(LAYERLIST):
@@ -112,7 +112,7 @@ for p in mb._MapBuilder__plotlist:
             mapdict={'varname':p.varname, 'longname':p.longvarname(), 'clim':clim, 'layer':layer, 'data':map2d, 'date':datestr,'units':p.units()}
             fig,ax=map_plotter_basemap_hourly(mapdict, TheMask)
             outfile = "%save.%02d.%s.%s" % (OUTPUTDIR, ALL_INDEXES[iFrame_plot], p.varname, layer.string())
-            print outfile
+            print(outfile)
             fig.savefig(outfile + ".png",dpi=86)
             pl.close(fig)
             #import sys

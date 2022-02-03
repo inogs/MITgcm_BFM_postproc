@@ -98,7 +98,7 @@ def readdata(time, var, ndims=3):
         M = np.zeros((24,jpj,jpi), np.float32)
     for iFrame in range(24):
         inputfile = "%save.%s-%02d:00:00.%s.nc" %(INPUTDIR,time,iFrame,var)
-        print inputfile
+        print(inputfile)
         M[iFrame,:] = DataExtractor(TheMask,inputfile,var,dimvar=ndims).values
     return M
 
@@ -180,7 +180,7 @@ for ip in PROCESSES[rank::nranks]:
     FGroup = FGROUPS[iFgroup]
     
     product_file = V7_filename(timeobj, FGroup)
-    print "rank =", rank, product_file
+    print("rank =", rank, product_file)
     ncOUT = create_Structure(OUTPUTDIR + product_file,FGroup)
     
     
