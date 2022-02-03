@@ -100,6 +100,12 @@ def readdata(time, var, ndims=3):
         inputfile = "%save.%s-%02d:00:00.%s.nc" %(INPUTDIR,time,iFrame,var)
         print(inputfile)
         M[iFrame,:] = DataExtractor(TheMask,inputfile,var,dimvar=ndims).values
+        a= DataExtractor(TheMask,inputfile,var,dimvar=ndims).values
+        if (ndims==3):
+            a[~TheMask.mask]=1.e+20
+        else:
+            a[~TheMask.mask[0,:]]=1.e+20
+        M[iFrame,:] = a        
     return M
 
 def create_Structure(filename, fgroup):
