@@ -74,7 +74,7 @@ def map_plotter_basemap_hourly(mapdict,maskobj):
     #map.drawcountries(linewidth=0.25)
     map2d=mapdict['data']
     Zm = np.ma.masked_invalid(map2d)
-    cs=map_obj.pcolormesh(maskobj.xlevels, maskobj.ylevels, Zm,cmap=cmap,latlon='true',vmin=vmin,vmax=vmax)
+    cs=map_obj.pcolormesh(maskobj.xlevels, maskobj.ylevels, Zm,cmap=cmap,latlon='true',shading='nearest',vmin=vmin,vmax=vmax)
 
     layerstr=mapdict['layer'].__repr__().lower()
     ax.annotate(mapdict['date'] ,xy=(0.60,0.93), xycoords='axes fraction' , fontsize=16)
