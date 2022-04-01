@@ -91,7 +91,7 @@ if DType == "fc": bulletin_type='forecast'
 bulletin_time = datetime.datetime.strptime(bulletin_date,"%Y%m%d")
 
 
-def readdata(time, var, ndims=3):
+def readdata(time, var, ndims=3, conversion_factor=1):
     if ndims==3:
         M = np.zeros((24,jpk,jpj,jpi),np.float32)
     else:
@@ -99,8 +99,7 @@ def readdata(time, var, ndims=3):
     for iFrame in range(24):
         inputfile = "%save.%s-%02d:00:00.%s.nc" %(INPUTDIR,time,iFrame,var)
         print(inputfile)
-        M[iFrame,:] = DataExtractor(TheMask,inputfile,var,dimvar=ndims).values
-        a= DataExtractor(TheMask,inputfile,var,dimvar=ndims).values
+        a= DataExtractor(TheMask,inputfile,var,dimvar=ndims).values * conversion_factor
         if (ndims==3):
             a[~TheMask.mask]=1.e+20
         else:
@@ -240,7 +239,7 @@ for ip in PROCESSES[rank::nranks]:
         setattr(ncvar,'coordinates'  ,'time depth latitude longitude')
         #CONVERSION from "mgC m-3" to "mmolC m-3"
         # conversion factor: 1/12
-        ncvar[:] = readdata(timestr, 'P_c') * (1./12.)
+        ncvar[:] = readdata(timestr, 'P_c', conversion_factor=1./12.)
 
         
         ncvar = ncOUT.createVariable('chl', 'f', ('time','depth','latitude','longitude'),zlib=True, fill_value=1.0e+20)
@@ -259,7 +258,7 @@ for ip in PROCESSES[rank::nranks]:
         setattr(ncvar,'coordinates'  ,'time depth latitude longitude')
 
         
-        ncvar[:] = readdata(timestr, "Z_c")* (1./12.)
+        ncvar[:] = readdata(timestr, "Z_c", conversion_factor=1./12.)
 
 
     if FGroup == 'BIOL':
@@ -302,7 +301,7 @@ for ip in PROCESSES[rank::nranks]:
         setattr(ncvar,'standard_name','mole_concentration_of_dissolved_inorganic_carbon_in_sea_water')
         setattr(ncvar,'coordinates'  ,'time depth latitude longitude')
         setattr(ncvar,'info'         , 'In order to calculate DIC in [micro mol / kg of seawater], dissic has to be multiplied by (1.e+6 / seawater density [kg/m3])')
-        ncvar[:] = readdata(timestr, "O3c")/(12*1000) # conversion mg/mol
+        ncvar[:] = readdata(timestr, "O3c", conversion_factor=1./(12*1000)) # conversion mg/mol
 
 
         ncvar = ncOUT.createVariable('talk', 'f', ('time','depth','latitude','longitude'),zlib=True, fill_value=1.0e+20)
@@ -312,7 +311,7 @@ for ip in PROCESSES[rank::nranks]:
         setattr(ncvar,'standard_name','sea_water_alkalinity_expressed_as_mole_equivalent')
         setattr(ncvar,'coordinates'  ,'time depth latitude longitude')
         setattr(ncvar,'info'         , 'In order to calculate ALK in [micro mol / kg of seawater], talk has to be multiplied by (1.e+6 / seawater density [kg/m3])')
-        ncvar[:] = readdata(timestr, "O3h")/1000 # conversion mg/mol
+        ncvar[:] = readdata(timestr, "O3h", conversion_factor=1./1000) # conversion mg/mol
         
 
 
@@ -324,7 +323,7 @@ for ip in PROCESSES[rank::nranks]:
         setattr(ncvar,'long_name'    ,"surface downward flux at air-sea interface of carbon dioxide expressed as kg of carbon per square meter per second")
         setattr(ncvar,'standard_name','surface_downward_mass_flux_of_carbon_dioxide_expressed_as_carbon')
         setattr(ncvar,'coordinates'  ,'time latitude longitude')
-        ncvar[:] = readdata(timestr, "CO2airflux", ndims=2) *12 * 1.e-6 /86400 # conversion from mmol m-2 day-1 to kg/m2/s
+        ncvar[:] = readdata(timestr, "CO2airflux", ndims=2, conversion_factor= 12 * 1.e-6 /86400) # conversion from mmol m-2 day-1 to kg/m2/s
         
 
         ncvar = ncOUT.createVariable('spco2', 'f', ('time','latitude','longitude'),zlib=True, fill_value=1.0e+20)
@@ -333,7 +332,7 @@ for ip in PROCESSES[rank::nranks]:
         setattr(ncvar,'long_name'    ,'Surface partial pressure of carbon dioxide in sea water')
         setattr(ncvar,'standard_name','surface_partial_pressure_of_carbon_dioxide_in_sea_water')
         setattr(ncvar,'coordinates'  ,'time latitude longitude')
-        ncvar[:] = readdata(timestr, "pCO2",ndims=2) *0.101325 #conversion microatm --> Pascal  1 ppm = 1 microatm = 1.e-6 * 101325 Pa
+        ncvar[:] = readdata(timestr, "pCO2",ndims=2, conversion_factor=0.101325) #conversion microatm --> Pascal  1 ppm = 1 microatm = 1.e-6 * 101325 Pa
 
     ncOUT.close()
         
