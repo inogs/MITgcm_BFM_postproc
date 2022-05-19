@@ -208,7 +208,7 @@ for ip in PROCESSES[rank::nranks]:
         ncvar = ncOUT.createVariable('wo', 'f', ('time','depth','latitude','longitude'),zlib=True, fill_value=1.0e+20)
         setattr(ncvar,'missing_value',ncvar._FillValue)
         setattr(ncvar,'units'        ,'"m s-1')
-        setattr(ncvar,'long_name'    ,'sea_water_z_velocity')
+        setattr(ncvar,'long_name'    ,'sea water z velocity')
         setattr(ncvar,'standard_name','upward_sea_water_velocity')
         setattr(ncvar,'coordinates'  ,'time depth latitude longitude')
         ncvar[:] = readdata(timestr, "W")
