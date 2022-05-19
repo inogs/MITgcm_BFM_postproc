@@ -189,7 +189,7 @@ for ip in PROCESSES[rank::nranks]:
         
         ncvar = ncOUT.createVariable('uo', 'f', ('time','depth','latitude','longitude'),zlib=True, fill_value=1.0e+20)
         setattr(ncvar,'missing_value',ncvar._FillValue)
-        setattr(ncvar,'units'        ,'"m s-1')
+        setattr(ncvar,'units'        ,'m s-1')
         setattr(ncvar,'long_name'    ,'eastward ocean current velocity')
         setattr(ncvar,'standard_name','eastward_sea_water_velocity')
         setattr(ncvar,'coordinates'  ,'time depth latitude longitude')
@@ -199,7 +199,7 @@ for ip in PROCESSES[rank::nranks]:
         
         ncvar = ncOUT.createVariable('vo', 'f', ('time','depth','latitude','longitude'),zlib=True, fill_value=1.0e+20)
         setattr(ncvar,'missing_value',ncvar._FillValue)
-        setattr(ncvar,'units'        ,'"m s-1')
+        setattr(ncvar,'units'        ,'m s-1')
         setattr(ncvar,'long_name'    ,'northward ocean current velocity')
         setattr(ncvar,'standard_name','northward_sea_water_velocity')
         setattr(ncvar,'coordinates'  ,'time depth latitude longitude')
@@ -207,8 +207,8 @@ for ip in PROCESSES[rank::nranks]:
 
         ncvar = ncOUT.createVariable('wo', 'f', ('time','depth','latitude','longitude'),zlib=True, fill_value=1.0e+20)
         setattr(ncvar,'missing_value',ncvar._FillValue)
-        setattr(ncvar,'units'        ,'"m s-1')
-        setattr(ncvar,'long_name'    ,'sea water z velocity')
+        setattr(ncvar,'units'        ,'m s-1')
+        setattr(ncvar,'long_name'    ,'upward ocean current velocity')
         setattr(ncvar,'standard_name','upward_sea_water_velocity')
         setattr(ncvar,'coordinates'  ,'time depth latitude longitude')
         ncvar[:] = readdata(timestr, "W")
