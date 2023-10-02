@@ -1,7 +1,7 @@
 import argparse
 def argument():
     parser = argparse.ArgumentParser(description = '''
-    Generates Netcdf from MIT .data hourly files
+    Generates Netcdf from MIT .data daily files
     ''')
 
 
@@ -81,7 +81,7 @@ dateend   = (rundate_dt + DL.relativedelta(hours=71)).strftime(dateformat)
 TheMask = Mask(args.maskfile)
 VARLIST= file2stringlist(args.varlist)
 
-timelist=DL.getTimeList(datestart, dateend, hours=1)
+timelist=DL.getTimeList(datestart, dateend, days=1)
 timestep = 200 #s, hardcoded
 
 TimeSteps_in_h = 3600/timestep
@@ -92,7 +92,7 @@ local_INDEXES = ALL_INDEXES[rank::nranks]
 for var in VARLIST:    
     for it in local_INDEXES:
         t = timelist[it]
-        inputfile = "%s%s.%010d.data" %(INPUTDIR,var, (it+1)*TimeSteps_in_h)
+        inputfile = "%s%s.%010d.data" %(INPUTDIR,var, (it+1)*TimeSteps_in_h*24)
         outfile   = "%save.%s.%s.nc"  %(OUTDIR,t.strftime(dateformat),var)
         print(outfile)
         M3d = readFrame_from_file(inputfile, 0, TheMask.shape)
