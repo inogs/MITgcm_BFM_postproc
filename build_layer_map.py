@@ -105,7 +105,7 @@ for p in mb._MapBuilder__plotlist:
                 inputfileU = "%save.%s.%s.nc"  %(INPUTDIR,dt.strftime(dateformat),'U')
                 inputfileV = "%save.%s.%s.nc"  %(INPUTDIR,dt.strftime(dateformat),'V')
                 datestr=dt.strftime("%d %h %Y - %H:%M UTC")
-                print("rank %d works on %s" %(rank, inputfileU))
+                print("rank %d works on %s" %(rank, inputfileU), flush=True)
                 DeU = DataExtractor(TheMask,inputfileU,'U')
                 DeV = DataExtractor(TheMask,inputfileV,'V')
 
@@ -128,7 +128,7 @@ for p in mb._MapBuilder__plotlist:
             dt=plot_timelist[iFrame_plot]
             inputfile="%save.%s.%s.nc"  %(INPUTDIR,dt.strftime(dateformat),var)
             datestr=dt.strftime("%d %h %Y - %H:%M UTC")
-            print("rank %d works on %s" %(rank, inputfile))
+            print("rank %d works on %s" %(rank, inputfile), flush=True)
             De = DataExtractor(TheMask,inputfile,var)
 
             for il, layer in enumerate(LAYERLIST):
