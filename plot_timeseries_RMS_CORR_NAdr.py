@@ -69,28 +69,28 @@ BGC_CLASS4_CHL_CORR_SURF_BASIN= LIST[9]
 BGC_CLASS4_CHL_POINTS_SURF_BASIN= LIST[10]
 
 ######### FILTER OUT NAN DAYS FROM SAT:
+# MODEL MEAN and SAT MEAN are calculated in the previous step by "ScMYvalidation_plan_STD_CORR_valid_NAdr.py" and they have NAN at the same timesteps for definition
 
-NAN_ARRAY=MODEL_MEAN
+NAN_ARRAY=MODEL_MEAN.copy()
 nNAN=np.sum(np.isnan(SAT___MEAN))
 
-if (np.sum(np.isnan(SAT___MEAN)) > 0):
-    MODEL_MEAN=MODEL_MEAN[~np.isnan(NAN_ARRAY)]
-    SAT___MEAN=SAT___MEAN[~np.isnan(NAN_ARRAY)]
-    MODEL_STD=MODEL_STD[~np.isnan(NAN_ARRAY)]
-    SAT___STD=SAT___STD[~np.isnan(NAN_ARRAY)]
-#    NUMBERS=NUMBERS[~np.isnan(NAN_ARRAY)]
+ii= ~np.isnan(NAN_ARRAY)
+if (np.sum(~ii) > 0):
+    MODEL_MEAN=MODEL_MEAN[ii]
+    SAT___MEAN=SAT___MEAN[ii]
+    MODEL_STD=MODEL_STD[ii]
+    SAT___STD=SAT___STD[ii]
  
-    BGC_CLASS4_CHL_RMS_SURF_BASIN  = BGC_CLASS4_CHL_RMS_SURF_BASIN[~np.isnan(NAN_ARRAY)]
-    BGC_CLASS4_CHL_BIAS_SURF_BASIN = BGC_CLASS4_CHL_BIAS_SURF_BASIN[~np.isnan(NAN_ARRAY)]
-    BGC_CLASS4_CHL_RMS_SURF_BASIN_LOG = BGC_CLASS4_CHL_RMS_SURF_BASIN_LOG[~np.isnan(NAN_ARRAY)]
-    BGC_CLASS4_CHL_BIAS_SURF_BASIN_LOG= BGC_CLASS4_CHL_BIAS_SURF_BASIN_LOG[~np.isnan(NAN_ARRAY)]
-    BGC_CLASS4_CHL_CORR_SURF_BASIN= BGC_CLASS4_CHL_CORR_SURF_BASIN[~np.isnan(NAN_ARRAY)]
-    BGC_CLASS4_CHL_POINTS_SURF_BASIN= BGC_CLASS4_CHL_POINTS_SURF_BASIN[~np.isnan(NAN_ARRAY)]
+    BGC_CLASS4_CHL_RMS_SURF_BASIN  = BGC_CLASS4_CHL_RMS_SURF_BASIN[ii]
+    BGC_CLASS4_CHL_BIAS_SURF_BASIN = BGC_CLASS4_CHL_BIAS_SURF_BASIN[ii]
+    BGC_CLASS4_CHL_RMS_SURF_BASIN_LOG = BGC_CLASS4_CHL_RMS_SURF_BASIN_LOG[ii]
+    BGC_CLASS4_CHL_BIAS_SURF_BASIN_LOG= BGC_CLASS4_CHL_BIAS_SURF_BASIN_LOG[ii]
+    BGC_CLASS4_CHL_CORR_SURF_BASIN= BGC_CLASS4_CHL_CORR_SURF_BASIN[ii]
+    BGC_CLASS4_CHL_POINTS_SURF_BASIN= BGC_CLASS4_CHL_POINTS_SURF_BASIN[ii]
 
 
-for ii in range(nNAN):
-    TIMES.pop(np.argwhere(np.isnan(NAN_ARRAY))[0,0])
-
+# Consider defined timeseps only: (discard Nan)
+TIMES = [ TIMES[k] for k in range(len(TIMES))  if ii[k] ]
 
 #########
 
@@ -102,8 +102,6 @@ nSUB = 1
 for isub,sub in enumerate(OGS.P):
   isub = 0
   if (sub.name=="adr1"):
-#  if (isub != 17):
-#  if (isub >20):
     print (sub.name)
     fig, ax = pl.subplots()
     ax.plot(TIMES,BGC_CLASS4_CHL_RMS_SURF_BASIN,'-k',label='RMS')
@@ -115,17 +113,13 @@ for isub,sub in enumerate(OGS.P):
     pl.setp(ltext,fontsize=14)
     pl.rc('xtick', labelsize=14)
     pl.rc('ytick', labelsize=14)
-#    pl.ylim(-1.3, 1.3)
-#    if (args.inputfile == "export_data_ScMYValidation_plan_coast.pkl"):
     if (args.inputfile == "export_data_ScMYValidation_plan_coast.pkl") | (args.inputfile == "export_data_ScMYValidation_plan_coast_V2.pkl" ):
          pl.ylim(-2.00, 5.00)
     else: 
          pl.ylim(-1.00, 2.50)
-#    ax.xaxis.set_major_locator(mdates.MonthLocator())
 #    ax.xaxis.set_major_formatter(mdates.DateFormatter("%m-%Y"))
 #    ax.xaxis.set_major_locator(mdates.DayLocator(interval=10))
     ax.xaxis.set_major_locator(mdates.MonthLocator())
-#    ax.xaxis.set_major_locator(mdates.DayLocator())
 #    ax.xaxis.set_major_locator(mdates.WeekdayLocator())
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y%m%d"))
     ax.grid(True)
@@ -135,7 +129,6 @@ for isub,sub in enumerate(OGS.P):
     ylabels = ax.get_yticklabels()
     pl.setp(ylabels, fontsize=14)
 #    #ax.tick_params(direction='left', pad=2)
-    #fig.show()
     outfilename_svg=args.outdir+"/"+'chl-RMS-BIAS_' + sub.name + ".svg"
     outfilename_png=args.outdir+"/"+'chl-RMS-BIAS_' + sub.name + ".png"
     print (outfilename_png)
@@ -156,10 +149,7 @@ for isub,sub in enumerate(OGS.P):
         pl.ylim(0, 10000)
     else:
         pl.ylim(0.0, 70000)
-#    ax.xaxis.set_major_locator(mdates.DayLocator(interval=10)) #(byweekday=0, interval=2))
     ax.xaxis.set_major_locator(mdates.MonthLocator()) #(byweekday=0, interval=2))
-   # ax.xaxis.set_major_locator(mdates.DayLocator()) 
-#    ax.xaxis.set_major_locator(mdates.WeekdayLocator())
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y%m%d"))
     xlabels = ax.get_xticklabels()
     pl.setp(xlabels, rotation=30,fontsize=11)
@@ -173,77 +163,4 @@ for isub,sub in enumerate(OGS.P):
     fig.savefig(outfile_svg,bbox_inches="tight")
     fig.savefig(outfile_png,bbox_inches="tight")
     pl.close(fig)
-
-
-import sys
-sys.exit()
-
-from commons.season import season
-S=season()
-S.setseasons(["0101", "0501", "0601", "1001"], ["winter","spring","summer","fall"])
-from commons import timerequestors
-from commons.Timelist import TimeInterval, TimeList
-TL=TimeList(TIMES)
-from commons.utils import writetable
-
-iSeas=0 # JAN-APR
-CLIM_REQ=timerequestors.Clim_season(iSeas,S)
-ii,w=TL.select(CLIM_REQ)
-RMS__win = np.nanmean(BGC_CLASS4_CHL_RMS_SURF_BASIN[     ii,:],axis=0)
-BIAS_win = np.nanmean(BGC_CLASS4_CHL_BIAS_SURF_BASIN[    ii,:],axis=0)
-RMSL_win = np.nanmean(BGC_CLASS4_CHL_RMS_SURF_BASIN_LOG[ ii,:],axis=0)
-BIASLwin = np.nanmean(BGC_CLASS4_CHL_BIAS_SURF_BASIN_LOG[ii,:],axis=0)
-
-MEAN_MOD_win = np.nanmean(MODEL_MEAN[ii,:],axis=0)
-MEAN_REF_win = np.nanmean(SAT___MEAN[ii,:],axis=0)
-
-STD_MOD_win = np.nanmean(MODEL_STD[ii,:],axis=0)
-STD_REF_win = np.nanmean(SAT___STD[ii,:],axis=0)
-CORR_win    = np.nanmean(BGC_CLASS4_CHL_CORR_SURF_BASIN[ii,:],axis=0)
-
-iSeas=2 # JUN-SEP
-CLIM_REQ=timerequestors.Clim_season(iSeas,S)
-ii,w=TL.select(CLIM_REQ)
-RMS__sum = np.nanmean(BGC_CLASS4_CHL_RMS_SURF_BASIN[     ii,:],axis=0)
-BIAS_sum = np.nanmean(BGC_CLASS4_CHL_BIAS_SURF_BASIN[    ii,:],axis=0)
-RMSL_sum = np.nanmean(BGC_CLASS4_CHL_RMS_SURF_BASIN_LOG[ ii,:],axis=0)
-BIASLsum = np.nanmean(BGC_CLASS4_CHL_BIAS_SURF_BASIN_LOG[ii,:],axis=0)
-
-MEAN_MOD_sum = np.nanmean(MODEL_MEAN[ii,:],axis=0)
-MEAN_REF_sum = np.nanmean(SAT___MEAN[ii,:],axis=0)
-
-STD_MOD_sum = np.nanmean(MODEL_STD[ii,:],axis=0)
-STD_REF_sum = np.nanmean(SAT___STD[ii,:],axis=0)
-CORR_sum    = np.nanmean(BGC_CLASS4_CHL_CORR_SURF_BASIN[ii,:],axis=0)
-
-#mat = np.zeros((nSUB,8),np.float32)
-#mat = np.zeros((nSUB,14),np.float32)
-mat = np.zeros((nSUB,18),np.float32)
-
-mat[:,0] = RMS__win
-mat[:,1] = RMS__sum
-mat[:,2] = BIAS_win
-mat[:,3] = BIAS_sum
-mat[:,4] = RMSL_win
-mat[:,5] = RMSL_sum
-mat[:,6] = BIASLwin
-mat[:,7] = BIASLsum
-mat[:,8] = STD_MOD_win
-mat[:,9] = STD_REF_win
-mat[:,10] = STD_MOD_sum
-mat[:,11] = STD_REF_sum
-mat[:,12] = CORR_win
-mat[:,13] = CORR_sum
-#----
-mat[:,14] = MEAN_MOD_win
-mat[:,15] = MEAN_REF_win
-mat[:,16] = MEAN_MOD_sum
-mat[:,17] = MEAN_REF_sum
-
-#outfiletable = args.outdir+"/"+"table4.1.dat"
-#rows_names=[sub.name for sub in OGS.P.basin_list]
-##column_names=['RMSwin','RMSsum','BIASwin','BIASsum', 'RMSLwin','RMSLsum','BIASLwin','BIASLsum']
-##column_names=['RMSwin','RMSsum','BIASwin','BIASsum', 'RMSLwin','RMSLsum','BIASLwin','BIASLsum','STD_MODwin','STD_SATwin','STD_MODsum','STD_SATsum','CORRwin','CORRsum']
-#column_names=['RMSwin','RMSsum','BIASwin','BIASsum', 'RMSLwin','RMSLsum','BIASLwin','BIASLsum','STD_MODwin','STD_SATwin','STD_MODsum','STD_SATsum','CORRwin','CORRsum','MEAN_MODwin','MEAN_SATwin','MEAN_MODsum','MEAN_SATsum']
-#writetable(outfiletable, mat, rows_names, column_names, fmt='%5.3f\t')
 

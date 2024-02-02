@@ -52,41 +52,32 @@ args = argument()
 fid = open(args.open_sea_file,'rb')
 LIST = pickle.load(fid)
 fid.close()
-#fid = open(args.open_sea_file)
-#LIST0 = pickle.load(fid)
-#fid.close()
-#TIMES,_,_,MODEL_MEAN,SAT___MEAN,_,_ = LIST
-#TIMES,_,_,MODEL_MEAN,SAT___MEAN,_,_,MODEL__STD,SAT____STD = LIST
-#TIMES,_,_,MODEL_MEAN,SAT___MEAN,_,_,MODEL__STD,SAT____STD,CORR = LIST
 TIMES,_,_,MODEL_MEAN,SAT___MEAN,_,_,MODEL__STD,SAT____STD,CORR,NUMBERS = LIST
-#TIMES_0,_,_,_,NAN_ARRAY,_,_,_,_,_,_ = LIST0
 
 print (TIMES)
 
-NAN_ARRAY=MODEL_MEAN
-#TIMES_0=TIMES#.copy()
+# MODEL MEAN and SAT MEAN are calculated in the previous step by "ScMYvalidation_plan_STD_CORR_valid_NAdr.py" and they have NAN at the same timesteps for definition
+
+NAN_ARRAY=MODEL_MEAN.copy()
+#NAN_ARRAY=SAT___MEAN.copy()
+
 
 nNAN=np.sum(np.isnan(SAT___MEAN))
 
 var_label = "CHL [mg/m$^3$]"
 
-if (np.sum(np.isnan(SAT___MEAN)) > 0):
-    MODEL_MEAN=MODEL_MEAN[~np.isnan(NAN_ARRAY)]
-    SAT___MEAN=SAT___MEAN[~np.isnan(NAN_ARRAY)]
-    MODEL__STD=MODEL__STD[~np.isnan(NAN_ARRAY)]
-    SAT____STD=SAT____STD[~np.isnan(NAN_ARRAY)]
-    CORR=CORR[~np.isnan(NAN_ARRAY)]
-    NUMBERS=NUMBERS[~np.isnan(NAN_ARRAY)]
+ii=~np.isnan(NAN_ARRAY)
+#if (np.sum(np.isnan(SAT___MEAN)) > 0):
+if (np.sum(~ii) > 0):
+    MODEL_MEAN=MODEL_MEAN[ii]
+    SAT___MEAN=SAT___MEAN[ii]
+    MODEL__STD=MODEL__STD[ii]
+    SAT____STD=SAT____STD[ii]
+    CORR=CORR[ii]
+    NUMBERS=NUMBERS[ii]
 
-for ii in range(nNAN):
-    TIMES.pop(np.argwhere(np.isnan(NAN_ARRAY))[0,0])
-
-
-
-#fid = open(args.coast_file)
-#LIST = pickle.load(fid)
-#fid.close()
-#model_coast = LIST[3]
+# Consider defined timeseps only: (discard Nan)
+TIMES = [ TIMES[k] for k in range(len(TIMES))  if ii[k] ]
 
 
 from basins import V2 as OGS
@@ -94,8 +85,6 @@ for isub,sub in enumerate(OGS.P):
   isub=0
 #  print sub.name
   if (sub.name=="adr1"):
-#  if (isub != 17):  # DO NOT CONSIDER ATLANTIC SUBBASIN
-#   if (sub.name != "adr1"):
     print (sub.name)
     fig, ax = pl.subplots()
     ax.plot(TIMES,SAT___MEAN,'og',label=' SAT')
