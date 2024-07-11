@@ -3,6 +3,9 @@ import argparse
 def argument():
     parser = argparse.ArgumentParser(description = '''
     Generates adriatic complete meshmask.nc
+    and another file with _noRivers suffix in the name
+    having tmask without rivers. It uses the river mask 
+    included in the mask produced in the A1 phase
     ''')
 
 
@@ -40,10 +43,11 @@ import numpy as np
 import netCDF4 as NC
 from commons import netcdf4
 from commons.utils import addsep
-
+from pathlib import Path
 
 DIR=addsep(args.inputdir)
 tmask=netcdf4.readfile(args.maskfile,'tmask')
+rivermask=netcdf4.readfile(args.maskfile,'rivermask')
 CellBottoms=netcdf4.readfile(args.maskfile,'CellBottoms')
 nav_lev = netcdf4.readfile(args.maskfile,'depth')
 jpk,jpj,jpi = tmask.shape
@@ -97,4 +101,38 @@ ncvar    = ncOUT.createVariable('nav_lon','f',('y','x'))                 ; ncvar
 #    short time_steps(time) ;
 ncvar    = ncOUT.createVariable('tmask' ,'d',('time','z', 'y', 'x') )    ; ncvar[:] = tmask 
 ncOUT.close()
+
+# create meshmask file without rivers in tmask
+
+tmask_noRivers = tmask - rivermask
+ncOUT=NC.Dataset(Path(args.outfile).stem+'_noRivers.nc',"w");
+
+ncOUT.createDimension('x',jpi);
+ncOUT.createDimension('y',jpj);
+ncOUT.createDimension('z',jpk);
+ncOUT.createDimension('time',1);
+
+ncOUT.createDimension('x_a',1);
+ncOUT.createDimension('y_a',1);
+ncOUT.createDimension('z_a',1);
+
+glamt  =xC
+gphit  =yC
+nav_lon=xC
+nav_lat=yC
+
+ncvar    = ncOUT.createVariable('e1t'   ,'d',('time','z_a', 'y', 'x')  ) ; ncvar[:] = e1t   ;
+ncvar    = ncOUT.createVariable('e2t'   ,'d',('time','z_a', 'y', 'x')  ) ; ncvar[:] = e2t   ;
+ncvar    = ncOUT.createVariable('e3t'   ,'d',('time',  'z', 'y', 'x'))  ;  ncvar[:] = e3t   ;
+
+ncvar    = ncOUT.createVariable('glamt'   ,'d',('time','z_a', 'y', 'x')) ; ncvar[:] = glamt ;
+ncvar    = ncOUT.createVariable('gphit'   ,'d',('time','z_a', 'y', 'x')) ; ncvar[:] = gphit ;
+ncvar    = ncOUT.createVariable('nav_lat','f',('y','x'))                 ; ncvar[:] = nav_lat;
+ncvar    = ncOUT.createVariable('nav_lev' ,'f',('z',))                   ; ncvar[:] = nav_lev;
+ncvar    = ncOUT.createVariable('nav_lon','f',('y','x'))                 ; ncvar[:] = nav_lon;
+#    float time(time) ;
+#    short time_steps(time) ;
+ncvar    = ncOUT.createVariable('tmask' ,'d',('time','z', 'y', 'x') )    ; ncvar[:] = tmask_noRivers
+ncOUT.close()
+
 
