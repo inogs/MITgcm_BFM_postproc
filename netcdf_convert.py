@@ -102,7 +102,7 @@ for var in VARLIST:
         t = timelist[it]
         if args.freq =='hourly': inputfile = "%s%s.%010d.data" %(INPUTDIR,var, (it+1)*TimeSteps_in_h)
         if args.freq =='daily' : inputfile = "%s%s.%010d.data" %(INPUTDIR,var, (it+1)*TimeSteps_in_h*24)
-        outfile   = "%save.%s.%s.nc"  %(OUTDIR,t.strftime(dateformat),var)
+        outfile   = "%save.%s.%s.nc"  %(OUTDIR,t,var)
         print(outfile)
         M3d = readFrame_from_file(inputfile, 0, TheMask.shape)
         M3d[~TheMask.mask] = 1.e+20
