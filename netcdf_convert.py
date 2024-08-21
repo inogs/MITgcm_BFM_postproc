@@ -17,11 +17,18 @@ def argument():
                                 help ='''Directory containg outputs of MITgcm
                                 '''
                                 )
-
-    parser.add_argument(   '--rundate',"-d",
+    parser.add_argument(   '--timelist',
                                 type = str,
                                 default = None,
-                                required = True
+                                required = True,
+                                help='Filename with times in %Y%m%d-%H:%M:%S format'
+                                )
+
+    parser.add_argument(   '--timestep',"-t",
+                                type = str,
+                                default = None,
+                                required = True,
+                                help = "timestep of MIT simulation in seconds."
                                 )
 
     parser.add_argument(   '--maskfile',"-m",
@@ -34,6 +41,12 @@ def argument():
                                 default = None,
                                 required = True
                                 )
+    parser.add_argument(   '--freq',"-f",
+                                type = str,
+                                choices = ['daily','hourly'],
+                                required = True
+                                )
+
     return parser.parse_args()
 
 args = argument()
@@ -70,19 +83,14 @@ def readFrame_from_file(filename,Frame,shape):
 
 INPUTDIR=addsep(args.inputdir)
 OUTDIR=addsep(args.outputdir)
-RUNDATE=args.rundate
 dateformat="%Y%m%d-%H:%M:%S"
 
 
-rundate_dt = datetime.strptime(RUNDATE,"%Y%m%d")
-datestart = (rundate_dt - DL.relativedelta(  days=7)).strftime(dateformat)
-dateend   = (rundate_dt + DL.relativedelta(hours=71)).strftime(dateformat)
-
 TheMask = Mask(args.maskfile)
 VARLIST= file2stringlist(args.varlist)
+timelist=file2stringlist(args.timelist)
 
-timelist=DL.getTimeList(datestart, dateend, hours=1)
-timestep = 200 #s, hardcoded
+timestep = int(args.timestep)
 
 TimeSteps_in_h = 3600/timestep
 ALL_INDEXES = np.arange((len(timelist)))
@@ -92,7 +100,8 @@ local_INDEXES = ALL_INDEXES[rank::nranks]
 for var in VARLIST:    
     for it in local_INDEXES:
         t = timelist[it]
-        inputfile = "%s%s.%010d.data" %(INPUTDIR,var, (it+1)*TimeSteps_in_h)
+        if args.freq =='hourly': inputfile = "%s%s.%010d.data" %(INPUTDIR,var, (it+1)*TimeSteps_in_h)
+        if args.freq =='daily' : inputfile = "%s%s.%010d.data" %(INPUTDIR,var, (it+1)*TimeSteps_in_h*24)
         outfile   = "%save.%s.%s.nc"  %(OUTDIR,t.strftime(dateformat),var)
         print(outfile)
         M3d = readFrame_from_file(inputfile, 0, TheMask.shape)
