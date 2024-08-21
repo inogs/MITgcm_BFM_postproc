@@ -20,12 +20,11 @@ def argument():
                                 help ='''Directory containg merged outputs of MITgcm
                                 '''
                                 )
-
-    parser.add_argument(   '--rundate',"-d",
+    parser.add_argument(   '--pattern', '-g',
                                 type = str,
-                                default = None,
-                                required = True
-                                )
+                                required = False,
+                                default = 'ave*nc',
+                                help = 'glob search pattern')
 
     parser.add_argument(   '--maskfile',"-m",
                                 type = str,
@@ -80,37 +79,33 @@ nranks =comm.size
 
 
 map_obj=Map_object.create_from_file(args.mapconfig)
-RUNDATE=args.rundate
 
 INPUTDIR=addsep(args.inputdir)
 OUTPUTDIR=addsep(args.outputdir)
 
-rundate_dt = datetime.strptime(RUNDATE,"%Y%m%d")
-datestart_plot = rundate_dt.strftime("%Y%m%d-%H:%M:%S")
-dateend        = (rundate_dt+DL.relativedelta(hours=71)).strftime("%Y%m%d-%H:%M:%S")
+
+TL = TimeList.fromfilenames(None, INPUTDIR, args.pattern )
 
 dateformat="%Y%m%d-%H:%M:%S"
 
 
-plot_timelist=DL.getTimeList(datestart_plot, dateend, hours=1)
-PTL= TimeList(plot_timelist)
 
 TheMask = Mask(args.maskfile)
 jpk,jpj,jpi=TheMask.shape
 plotlistfile=args.plotlistfile
 
-mb = MapBuilder(plotlistfile,PTL,TheMask,OUTPUTDIR)
+mb = MapBuilder(plotlistfile,TL,TheMask,OUTPUTDIR)
 
 for p in mb._MapBuilder__plotlist:
     var=p.varname
     LAYERLIST = p.layerlist
 
-    ALL_INDEXES = np.arange((len(plot_timelist)))
+    ALL_INDEXES = np.arange(TL.nTimes)
     local_INDEXES = ALL_INDEXES[rank::nranks]
 
     if var == 'Speed':
         for iFrame_plot in local_INDEXES:
-                dt=plot_timelist[iFrame_plot]
+                dt=TL.Timelist[iFrame_plot]
                 inputfileU = "%save.%s.%s.nc"  %(INPUTDIR,dt.strftime(dateformat),'U')
                 inputfileV = "%save.%s.%s.nc"  %(INPUTDIR,dt.strftime(dateformat),'V')
                 datestr=dt.strftime("%d %h %Y - %H:%M UTC")
@@ -134,7 +129,7 @@ for p in mb._MapBuilder__plotlist:
     else:
 
         for iFrame_plot in local_INDEXES:
-            dt=plot_timelist[iFrame_plot]
+            dt=TL.Timelist[iFrame_plot]
             inputfile="%save.%s.%s.nc"  %(INPUTDIR,dt.strftime(dateformat),var)
             datestr=dt.strftime("%d %h %Y - %H:%M UTC")
             print("rank %d works on %s" %(rank, inputfile), flush=True)
