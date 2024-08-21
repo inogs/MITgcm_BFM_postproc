@@ -37,6 +37,11 @@ def argument():
                                 default = None,
                                 required = True
                                 )
+    parser.add_argument(   '--mapconfig',"-f",
+                                type = str,
+                                default = None,
+                                required = True
+                                )
     return parser.parse_args()
 
 args = argument()
@@ -54,8 +59,9 @@ from commons.dataextractor import DataExtractor
 from layer_integral.mapbuilder import MapBuilder
 import pylab as pl
 from commons.layer import Layer
-from map_gen import map_plotter_basemap_hourly
-from map_gen import quiver_plotter_basemap_hourly
+
+from map_gen import Map_object
+
 from datetime import datetime
 from commons.utils import addsep
 
@@ -71,6 +77,8 @@ except:
     isParallel = False
 
 
+
+map_obj=Map_object.create_from_file(args.mapconfig)
 RUNDATE=args.rundate
 
 INPUTDIR=addsep(args.inputdir)
@@ -117,7 +125,7 @@ for p in mb._MapBuilder__plotlist:
                         clim = p.climlist[il] #(0.0, 0.4)
                         Udict={'varname':'U', 'longname':'Zonal velocity',      'clim':clim, 'layer':layer, 'data':U2d, 'date':datestr,'units':'m s⁻¹'}
                         Vdict={'varname':'V', 'longname':'Meridional velocity', 'clim':clim, 'layer':layer, 'data':V2d, 'date':datestr,'units':'m s⁻¹'}
-                        fig,ax=quiver_plotter_basemap_hourly(Udict, Vdict, TheMask, zoomGoT = False)
+                        fig,ax=map_obj.quiver_plotter_basemap_hourly(Udict, Vdict, TheMask)
                         outfile = "%save.%02d.%s.%s" % (OUTPUTDIR, ALL_INDEXES[iFrame_plot], p.varname, layer.string())
                         print(outfile,flush=True)
                         fig.savefig(outfile + ".png",dpi=86)
@@ -137,7 +145,7 @@ for p in mb._MapBuilder__plotlist:
 
                 clim = p.climlist[il]
                 mapdict={'varname':p.varname, 'longname':p.longvarname(), 'clim':clim, 'layer':layer, 'data':map2d, 'date':datestr,'units':p.units()}
-                fig,ax=map_plotter_basemap_hourly(mapdict, TheMask)
+                fig,ax=map_obj.map_plotter_basemap_hourly(mapdict, TheMask)
                 outfile = "%save.%02d.%s.%s" % (OUTPUTDIR, ALL_INDEXES[iFrame_plot], p.varname, layer.string())
                 print(outfile,flush=True)
                 fig.savefig(outfile + ".png",dpi=86)

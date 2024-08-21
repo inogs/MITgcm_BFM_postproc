@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+<xlim min="12.1" max="16.1" />
+<ylim min="43.5" max="45.85" />
+
+<date     fontsize="16" xpos="0.60" ypos="0.93" halignment="left" />
+<layerstr fontsize="16" xpos="0.77" ypos="0.85" halignment="center" />
+
+<parallels start="43.0" stop="46" step="0.5"/>
+<meridians start="12.0" stop="20.0" step="1"/>
+</root>
