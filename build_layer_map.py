@@ -54,6 +54,7 @@ from commons import genUserDateList as DL
 import numpy as np
 import numpy.ma as ma
 from commons.mask import Mask
+from utilities.mpi_serial_interface import get_mpi_communicator
 
 from commons.dataextractor import DataExtractor
 from layer_integral.mapbuilder import MapBuilder
@@ -66,15 +67,15 @@ from datetime import datetime
 from commons.utils import addsep
 
 try:
-    from mpi4py import MPI
-    comm  = MPI.COMM_WORLD
-    rank  = comm.Get_rank()
-    nranks =comm.size
-    isParallel = True
+    import mpi4py
 except:
-    rank   = 0
-    nranks = 1
-    isParallel = False
+    pass
+
+comm = get_mpi_communicator()
+rank  = comm.Get_rank()
+nranks =comm.size
+
+
 
 
 
