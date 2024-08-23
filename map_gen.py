@@ -215,7 +215,8 @@ class Map_object(Basemap):
 
     @staticmethod
     def create_from_file(configfile):
-        xml=minidom.parse(configfile)
+        with open(configfile, 'r') as f:
+            xml=minidom.parse(f)
         xmin=float(xml.getElementsByTagName('xlim')[0].attributes['min'].value)
         xmax=float(xml.getElementsByTagName('xlim')[0].attributes['max'].value)
         ymin=float(xml.getElementsByTagName('ylim')[0].attributes['min'].value)
