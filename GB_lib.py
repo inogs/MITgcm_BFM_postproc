@@ -1,7 +1,6 @@
 import numpy as np
 import os,time
-import scipy.io.netcdf as NC
-from commons.dataextractor import DataExtractor
+from bitsea.commons.dataextractor import DataExtractor
 import netCDF4
 
 def recognize_terms(formula):
@@ -165,7 +164,7 @@ def WriteAggregateAvefiles(mask, N1pfile,INPUT_AVEDIR, AGGREGATE_AVEDIR, OUTDIR,
             avevar = var[var.find('TRN')+3:]
         else: avevar = var
         outfile = OUTDIR + F.prefix + "." + F.datestr + "." + avevar + ".nc"
-        ncOUT=NC.netcdf_file(outfile,"w")
+        ncOUT=netCDF4.Dataset(outfile,"w")
         setattr(ncOUT,"Convenctions","COARDS")
         ncOUT.createDimension('time',  1)
         ncOUT.createDimension('depth', jpk)
@@ -183,7 +182,7 @@ def WriteAggregateAvefiles(mask, N1pfile,INPUT_AVEDIR, AGGREGATE_AVEDIR, OUTDIR,
         setattr(ncOUT.variables['lon'],"long_name","Longitude")
         setattr(ncOUT.variables['lat'],"long_name","Latitude")
 
-        ncvar=ncOUT.createVariable(var,'f',('time','depth','lat','lon'))
+        ncvar=ncOUT.createVariable(var,'f',('time','depth','lat','lon'),zlib=True,fill_value=1.e+20)
         for lvar in aggrlist:
             if lvar.find('TRN')>-1:
                 avevar = lvar[lvar.find('TRN')+3:]
@@ -197,7 +196,7 @@ def WriteAggregateAvefiles(mask, N1pfile,INPUT_AVEDIR, AGGREGATE_AVEDIR, OUTDIR,
         junk[~mask.mask] = 1.e+20
         ncvar[:]=junk
         setattr(ncvar,"long_name",var)
-        setattr(ncvar,"missing_value",1.e+20)
+        setattr(ncvar,"missing_value",np.float32(1.e+20))
         del DE
         ncOUT.close()
 
